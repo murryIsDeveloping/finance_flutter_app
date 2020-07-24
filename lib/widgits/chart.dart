@@ -36,19 +36,22 @@ class Chart extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 5,
-      margin: EdgeInsets.all(20),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: groupedTransactionValues
-            .map((t) => Expanded(
-                  child: ChartBar(
-                      label: t["day"],
-                      spendingAmount: t["amount"],
-                      spendingPtOfTotal: maxSpending == 0.0
-                          ? 0.0
-                          : (t["amount"] as double) / maxSpending),
-                ))
-            .toList(),
+      margin: EdgeInsets.all(8),
+      child: Padding(
+        padding: EdgeInsets.all(10.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: groupedTransactionValues
+              .map((t) => Expanded(
+                    child: ChartBar(
+                        label: t["day"],
+                        spendingAmount: t["amount"],
+                        spendingPtOfTotal: maxSpending == 0.0
+                            ? 0.0
+                            : (t["amount"] as double) / maxSpending),
+                  ))
+              .toList(),
+        ),
       ),
     );
   }

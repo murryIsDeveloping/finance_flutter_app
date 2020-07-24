@@ -30,6 +30,8 @@ class _HomePageState extends State<HomePage> {
     // ),
   ];
 
+  var _showChart = false;
+
   List<Transaction> get _recentTransactions {
     return _transactions
         .where(
@@ -113,26 +115,59 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          "Finance Tracker",
-        ),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(
-              Icons.add,
-              color: Colors.white,
-            ),
-            onPressed: () => _startAddNewTransaction(context),
-          )
-        ],
+    final appBar = AppBar(
+      title: Text(
+        "Finance Tracker",
       ),
+      actions: <Widget>[
+        IconButton(
+          icon: Icon(
+            Icons.add,
+            color: Colors.white,
+          ),
+          onPressed: () => _startAddNewTransaction(context),
+        )
+      ],
+    );
+
+    var _appHeight = MediaQuery.of(context).size.height -
+        (appBar.preferredSize.height + MediaQuery.of(context).padding.top);
+
+    var lowHeight = MediaQuery.of(context).size.height <= 500;
+
+    return Scaffold(
+      appBar: appBar,
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Chart(_recentTransactions),
-            TransactionCards(_transactions, _removeTransaction),
+            if (lowHeight)
+              Container(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Text("Toggle Chart"),
+                    Switch(
+                      value: _showChart,
+                      onChanged: (val) => setState(() => _showChart = val),
+                    ),
+                  ],
+                ),
+              ),
+            if (!lowHeight)
+              Container(
+                height: _appHeight * 0.35,
+                child: Chart(_recentTransactions),
+              ),
+            if (lowHeight && _showChart == true)
+              Container(
+                height: _appHeight - 125,
+                child: Chart(_recentTransactions),
+              ),
+            if (!lowHeight || _showChart == false)
+              Container(
+                height: lowHeight ? _appHeight - 50 : _appHeight * 0.65,
+                child: TransactionCards(_transactions, _removeTransaction),
+              ),
           ],
         ),
       ),
