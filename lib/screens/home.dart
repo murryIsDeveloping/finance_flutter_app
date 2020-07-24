@@ -4,6 +4,11 @@ import './../models/transaction.dart';
 import './../widgits/transaction-cards.dart';
 import './../widgits/create-transaction-card.dart';
 
+const buttonText = TextStyle(
+  color: Colors.white,
+  fontWeight: FontWeight.bold,
+);
+
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
@@ -37,15 +42,60 @@ class _HomePageState extends State<HomePage> {
         .toList();
   }
 
-  void _addTransaction({String title, double amount}) {
+  void _addTransaction({String title, double amount, DateTime date}) {
     setState(() {
       _transactions.add(Transaction(
         id: DateTime.now().toString(),
         title: title,
         amount: amount,
-        date: DateTime.now(),
+        date: date,
       ));
     });
+  }
+
+  Future<void> _removeTransaction(Transaction transToDelete) async {
+    return showDialog(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+              'Are you sure you want to remove ${transToDelete.title}(\$${transToDelete.amount.toStringAsFixed(2)}) from transactions.'),
+          content: Container(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                RaisedButton(
+                  color: Theme.of(context).primaryColor,
+                  child: Text(
+                    'Keep',
+                    style: buttonText,
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                RaisedButton(
+                  color: Theme.of(context).errorColor,
+                  child: Text(
+                    'Remove',
+                    style: buttonText,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _transactions = _transactions
+                          .where((trans) => trans.id != transToDelete.id)
+                          .toList();
+                    });
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   void _startAddNewTransaction(BuildContext ctx) {
@@ -82,7 +132,7 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           children: [
             Chart(_recentTransactions),
-            TransactionCards(_transactions),
+            TransactionCards(_transactions, _removeTransaction),
           ],
         ),
       ),
